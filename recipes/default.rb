@@ -14,29 +14,8 @@ package "build-essential"
 
 package "tcl8.5"
 
-remote_file "/tmp/redis-2.8.9.tar.gz" do
-  source "http://download.redis.io/releases/redis-2.8.9.tar.gz"
-  notifies :run, "execute[unzip_redis_archive]", :immediately
-end
-
-execute "unzip_redis_archive" do
-  command 'tar xzf redis-2.8.9.tar.gz'
-  cwd "/tmp"
-  action :nothing
-  notifies :run, "execute[build_and_install_redis]", :immediately
-end
-
-execute "build_and_install_redis" do
-  command 'make && make install'
-  cwd "/tmp/redis-2.8.9"
-  action :nothing
-  notifies :run, "execute[install_server_redis]", :immediately
-end
-
-execute "install_server_redis" do
-  command "echo -n | ./install_server.sh"
-  cwd "/tmp/redis-2.8.9/utils"
-  action :nothing
+redis node['redis']['version'] do
+  source "http://download.redis.io/releases/redis-#{node['redis']['version']}.tar.gz"
 end
 
 service "redis_6379" do
